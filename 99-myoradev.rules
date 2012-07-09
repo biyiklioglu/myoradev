@@ -1,0 +1,34 @@
+
+
+ENV{KERNEL_NAME_MATCH}="dm-*"
+
+
+ENV{KERNEL_NAME_MATCH}!="sddlm*1", GOTO="hdlm_end"
+
+LABEL="hdlm_start"
+
+KERNEL=="sddlm*1" SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", PROGRAM=="/sbin/scsi_id -g -u /dev/$name", RUN+="/sbin/myoradev.sh $result $major $minor"
+
+LABEL="hdlm_end"
+
+
+ENV{KERNEL_NAME_MATCH}!="emcpower*1", GOTO="pp_end"
+
+LABEL="pp_start"
+
+KERNEL=="sddlm*" SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", PROGRAM=="/sbin/scsi_id -g -u /dev/$name", RUN+="/sbin/myoradev.sh $result $major $minor"
+
+LABEL="pp_end"
+
+
+
+ENV{KERNEL_NAME_MATCH}!="dm-*", GOTO="dm_end"
+
+LABEL="dm_start"
+
+TEST=="dm", ENV{DM_NAME}="$attr{dm/name}"
+
+#KERNEL=="dm-*", SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", PROGRAM=="/sbin/scsi_id -g -u /dev/$name", RUN+="/lib/udev/myoradev.sh $result $major $minor"
+KERNEL=="dm-*", SUBSYSTEM=="block", ENV{DM_NAME}=="*p1", PROGRAM=="/sbin/scsi_id -g -u /dev/$name", RUN+="/lib/udev/myoradev.sh $result $major $minor"
+
+LABEL="dm_end"
